@@ -47,7 +47,19 @@ services:
     networks:
       - backend
   
- 
+
+  mongodb-seed:
+    image: mongo:8.0-rc
+    container_name: mongodb-seed
+    depends_on:
+      - mongo  
+    volumes:
+      - ./seeding.json:/mongodb-init/seeding.json  
+    networks:
+      - backend
+    command: mongoimport --host mongo --db movies_dbdocker --collection movies --username ${MONGODB_USERNAME} --password ${MONGODB_PASSWORD} --drop --jsonArray --file /mongodb-init/seeding.json
+
+
 networks:
   backend:
 
