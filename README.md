@@ -4,6 +4,13 @@ __Name:__ Pawel Jaglarz
 
 __Demo:__ 
 
+
+
+This repository contains the containerization of the mukti-container application illustrated below.
+
+![](./images/arch.png)
+
+
 ### Overview.
 This project containerizes a multi-service application using Docker Compose. It includes:
 
@@ -12,7 +19,7 @@ MongoDB: Stores the application’s data persistently.
 Redis: Caches data for quick access.
 Mongo Express: Web-based MongoDB management tool for development.
 
-![](./images/arch.png)
+
 
 ### Database Seeding
 The MongoDB service is automatically seeded with initial data for testing and development. The data is loaded from a JSON file (seeding.json) and imported into MongoDB when the project starts.
