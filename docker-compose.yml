@@ -20,8 +20,8 @@ services:
     image: mongo:8.0-rc
     container_name: mongo
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
     volumes:
       - mongo_data:/data/db
     networks:
@@ -57,7 +57,7 @@ services:
       - ./seeding.json:/mongodb-init/seeding.json  
     networks:
       - movies-network
-    command: mongoimport --host mongo --db movies_dbdocker --collection movies --username admin --password password --authenticationDatabase admin --drop --jsonArray --file /mongodb-init/seeding.json
+    command: mongoimport --host mongo --db movies_dbdocker --collection movies --username admin --password ${MONGODB_PASSWORD} --authenticationDatabase admin --drop --jsonArray --file /mongodb-init/seeding.json
 
 
 
