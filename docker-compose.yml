@@ -36,8 +36,8 @@ services:
     depends_on:
       - mongodb
     volumes:
-      - /seeding.json:/seeding.json
-    command: mongoimport --host mongodb --db tmdb_movies --collection movies --authenticationDatabase admin --username ${MONGODB_USERNAME} --password ${MONGODB_PASSWORD} --drop --jsonArray --file /seeding.json
+      - ./seeding.json:/seeding.json
+    command: mongoimport --host mongodb --db tmdb_movies --collection movies --authenticationDatabase admin --username ${MONGODB_USERNAME} --password ${MONGODB_PASSWORD} --drop --jsonArray --file ./seeding.json
     profiles:
       - dev
     links:
