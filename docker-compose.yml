@@ -1,68 +1,80 @@
 services:
-  # Movies API Service
   api:
-    container_name: movies-api
     image: doconnor/movies-api:1.0
+    container_name: movies-api
     ports:
       - '9000:9000'
     environment:
-      MONGODB_URI: mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@mongo:27017
-      REDIS_URI: redis://redis:6379
-      ENABLE_WRITING_HANDLERS: 'false'
+      - MONGODB_URI=mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@mongodb:27017
+      - REDIS_URI=redis://redis
+      - ENABLE_WRITING_HANDLERS=false
+    networks:
+      - api-network
+      - redis-network
     depends_on:
-      - mongo
+      - mongodb
       - redis
-    networks:
-      - movies-network
+    restart: always
 
-
-  mongo:
+  mongodb:
     image: mongo:8.0-rc
-    container_name: mongo
+    container_name: mongodb
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+    networks:
+      - api-network
+      - mongo-network
     volumes:
-      - mongo_data:/data/db
-    networks:
-      - movies-network
-
- 
-  redis:
-    image: redis:alpine
-    container_name: redis
-    networks:
-      - movies-network
-
-
-  mongo-express:
-    image: mongo-express:1.0-20-alpine3.19
-    container_name: mongo-express
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGODB_USERNAME}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGODB_PASSWORD}
-      ME_CONFIG_MONGODB_SERVER: mongo
-    ports:
-      - "8081:8081" 
-    networks:
-      - movies-network
-  
+      - mongodb_data:/data/db
 
   mongodb-seed:
     image: mongo:8.0-rc
     container_name: mongodb-seed
-    depends_on:
-      - mongo  
-    volumes:
-      - ./seeding.json:/mongodb-init/seeding.json  
     networks:
-      - movies-network
-    command: mongoimport --host mongo --db movies_dbdocker --collection movies --username admin --password ${MONGODB_PASSWORD} --authenticationDatabase admin --drop --jsonArray --file /mongodb-init/seeding.json
+      - mongo-network
+    depends_on:
+      - mongodb
+    volumes:
+      - /seeding.json:/mongodb-init/seeding.json
+    command: mongoimport --host mongodb --db tmdb_movies --collection movies --authenticationDatabase admin --username ${MONGODB_USERNAME} --password ${MONGODB_PASSWORD} --drop --jsonArray --file /mongodb-init/seeding.json
+    profiles:
+      - dev
+    links:
+      - mongodb
 
+  redis:
+    image: redis:alpine
+    container_name: redis
+    networks:
+      - redis-network
+    ports:
+      - '6379:6379'
 
+  mongo-express:
+    image: mongo-express:1.0-20-alpine3.19
+    container_name: mongo-express
+    restart: always
+    ports:
+      - '8081:8081'
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGODB_USERNAME}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGODB_PASSWORD}
+      - ME_CONFIG_MONGODB_SERVER=mongodb 
+    depends_on:
+      - mongodb
+    networks:
+      - mongo-network
+    profiles:
+      - dev
 
 networks:
-  movies-network:
+  api-network:
+    name: api-network
+  mongo-network:
+    name: mongo-network
+  redis-network:
+    name: redis-network
 
 volumes:
-  mongo_data:
+  mongodb_data:
