@@ -6,9 +6,9 @@ __Demo:__
 
 
 
-This repository contains the containerization of the mukti-container application illustrated below.
+This repository contains the containerization of the multi-container application illustrated below.
 
-![](./images/arch.png)
+![](./arch.png)
 
 
 ### Overview.
@@ -18,7 +18,6 @@ Movies API: Provides access to movie data.
 MongoDB: Stores the application’s data persistently.
 Redis: Caches data for quick access.
 Mongo Express: Web-based MongoDB management tool for development.
-
 
 
 ### Database Seeding
